@@ -59,7 +59,7 @@ sub configure {
 
         ## Grab the values we already have for our settings, if any exist
         $template->param(
-            enable_opac_payments => $self->retrieve_data('enable_opac_payments'),
+            footers => C4::Context->config("email_footers");
         );
 
         $self->output_html( $template->output() );
@@ -127,7 +127,39 @@ in process_message_queue.pl
 sub before_send_messages {
     my ( $self, $params ) = @_;
 
-    print "Plugin hook before_send_message called with the params: " . Data::Dumper::Dumper( $params );
+    my $email_footers = C4::Context->config("email_footers");
+    my $footers;
+    foreach my $f ( @{$email_footers->{footer}} ) {
+        my $lang = $f->{lang} || 'default';
+        my $type = $f->{type} || 'text';
+        my $content = $f->{content};
+        $footers->{$lang}->{$type} = $content;
+	}
+
+    my $messages = Koha::Notice::Messages->search(
+        {
+            status                 => 'pending',
+            message_transport_type => 'email',
+        }
+    );
+
+    my $TranslateNotices = C4::Context->preference('TranslateNotices');
+
+	while ( my $m = $messages->next ) {
+		my $lang = 'default';
+        if ( $TranslateNotices ) {
+			my $patron = Koha::Patrons->find( $m->borrowernumber );
+            $lang = $patron->lang;
+        }
+
+        my $footers_for_lang = $footers->{$lang} || $footers->{default};
+
+        my $type = $m->content_type =~ m|^text/html| ? 'html' : 'text';
+
+        my $footer = $footers_for_lang->{$type} || $footers_for_lang->{text};
+
+        $m->content( $m->content . $footer )->update();
+	}
 }
 
 
