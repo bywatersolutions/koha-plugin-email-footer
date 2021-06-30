@@ -24,7 +24,7 @@ You are receiving this email because you opted in through your agreement with th
 For more information on library notifications, please contact us at &lt;phone number&gt;.
     </footer>
     <footer lang="fr-FR" type="text">
-You are receiving this email because you opted in through your agreement with the library.
+Vous recevez cet e-mail car vous vous êtes inscrit via votre accord avec la bibliothèque.
 Pour plus d'informations sur les notifications de la bibliothèque, veuillez nous contacter au &lt;phone number&gt;.
     </footer>
     <footer lang="fr-FR" type="html">

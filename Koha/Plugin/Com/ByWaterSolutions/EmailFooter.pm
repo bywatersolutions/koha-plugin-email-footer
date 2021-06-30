@@ -59,7 +59,7 @@ sub configure {
 
         ## Grab the values we already have for our settings, if any exist
         $template->param(
-            footers => C4::Context->config("email_footers");
+            footers => C4::Context->config("email_footers"),
         );
 
         $self->output_html( $template->output() );
