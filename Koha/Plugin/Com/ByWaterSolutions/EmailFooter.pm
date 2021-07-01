@@ -162,5 +162,23 @@ sub before_send_messages {
 	}
 }
 
+=head3 intranet_js
+
+intranet_js for this plugin, hides the disable and uninstall buttons for the plugin itself.
+
+=cut
+
+sub intranet_js {
+    my ( $self ) = @_;
+
+    return q|
+<script>
+    $(document).ready(function(){
+        $('a[href="/cgi-bin/koha/plugins/plugins-uninstall.pl?class=Koha::Plugin::Com::ByWaterSolutions::EmailFooter"]').hide();
+        $('a[href="/cgi-bin/koha/plugins/plugins-enable.pl?class=Koha::Plugin::Com::ByWaterSolutions::EmailFooter&method=disable"]').hide();
+    });
+</script>
+    |;
+}
 
 1;
