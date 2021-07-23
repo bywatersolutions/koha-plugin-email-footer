@@ -154,9 +154,10 @@ sub before_send_messages {
 
         my $footers_for_lang = $footers->{$lang} || $footers->{default};
 
-        my $type = $m->content_type =~ m|^text/html| ? 'html' : 'text';
+        my $content_type = $m->content_type // q{};
+        my $type = $content_type =~ m|^text/html| ? 'html' : 'text';
 
-        my $footer = $footers_for_lang->{$type} || $footers_for_lang->{text};
+        my $footer = $footers_for_lang->{$type} || $footers_for_lang->{text} || q{};
 
         $m->content( $m->content . $footer )->update();
 	}
