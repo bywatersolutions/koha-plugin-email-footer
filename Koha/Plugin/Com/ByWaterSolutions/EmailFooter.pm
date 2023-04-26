@@ -163,7 +163,8 @@ sub before_send_messages {
 
         my $footer = $footers_for_lang->{$type} || $footers_for_lang->{text} || q{};
 
-        $m->content( $m->content . $footer )->update();
+        $m->content( $m->content . $footer )->update()
+          if index( $m->content, $footer ) == -1; # Skip update if this email already has a footer
 	}
 }
 
