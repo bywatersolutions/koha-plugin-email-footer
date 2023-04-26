@@ -127,6 +127,10 @@ in process_message_queue.pl
 sub before_send_messages {
     my ( $self, $params ) = @_;
 
+    # If a type limit is passed in, only run if the type is "email"
+    return if ref($type) eq 'ARRAY' && scalar @$type > 0 && !grep(/^email$/, @$type); # 22.11.00, 22.05.8, 21.11.14 +, bug 27265
+    return if ref($type) eq q{}     && $type ne q{}      && $type ne 'email';
+
     my $email_footers = C4::Context->config("email_footers");
     my $footers;
     foreach my $f ( @{$email_footers->{footer}} ) {
