@@ -127,6 +127,9 @@ in process_message_queue.pl
 sub before_send_messages {
     my ( $self, $params ) = @_;
 
+    my $type        = $params->{type};
+    my $letter_code = $params->{letter_code};
+
     # If a type limit is passed in, only run if the type is "email"
     return if ref($type) eq 'ARRAY' && scalar @$type > 0 && !grep(/^email$/, @$type); # 22.11.00, 22.05.8, 21.11.14 +, bug 27265
     return if ref($type) eq q{}     && $type ne q{}      && $type ne 'email';
@@ -140,12 +143,12 @@ sub before_send_messages {
         $footers->{$lang}->{$type} = $content;
 	}
 
-    my $messages = Koha::Notice::Messages->search(
-        {
-            status                 => 'pending',
-            message_transport_type => 'email',
-        }
-    );
+    my $parameters = {
+        status                 => 'pending',
+        message_transport_type => 'email',
+    };
+    $parameters->{letter_code} = $letter_code if $letter_code;
+    my $messages = Koha::Notice::Messages->search($parameters);
 
     my $TranslateNotices = C4::Context->preference('TranslateNotices');
 
