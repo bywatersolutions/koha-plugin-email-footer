@@ -13,7 +13,7 @@ use C4::Context;
 use Cwd qw(abs_path);
 
 ## Here we set our plugin version
-our $VERSION = "{VERSION}";
+our $VERSION         = "{VERSION}";
 our $MINIMUM_VERSION = "{MINIMUM_VERSION}";
 
 our $metadata = {
@@ -24,7 +24,8 @@ our $metadata = {
     minimum_version => $MINIMUM_VERSION,
     maximum_version => undef,
     version         => $VERSION,
-    description     => 'This plugin adds an "unsubscribe" footer to every outgoing email.'
+    description     =>
+      'This plugin adds an "unsubscribe" footer to every outgoing email.'
 };
 
 =head3 new
@@ -55,12 +56,10 @@ sub configure {
     my $cgi = $self->{'cgi'};
 
     unless ( $cgi->param('save') ) {
-        my $template = $self->get_template({ file => 'configure.tt' });
+        my $template = $self->get_template( { file => 'configure.tt' } );
 
         ## Grab the values we already have for our settings, if any exist
-        $template->param(
-            footers => C4::Context->config("email_footers"),
-        );
+        $template->param( footers => C4::Context->config("email_footers"), );
 
         $self->output_html( $template->output() );
     }
@@ -131,20 +130,22 @@ sub before_send_messages {
     my $letter_code = $params->{letter_code};
 
     # If a type limit is passed in, only run if the type is "email"
-    return if ref($type) eq 'ARRAY' && scalar @$type > 0 && !grep(/^email$/, @$type); # 22.11.00, 22.05.8, 21.11.14 +, bug 27265
-    return if ref($type) eq q{}     && $type ne q{}      && $type ne 'email';
+    return if ref($type) eq 'ARRAY' && scalar @$type > 0 && !grep( /^email$/, @$type );  # 22.11.00, 22.05.8, 21.11.14 +, bug 27265
+    return if ref($type) eq q{} && $type ne q{} && $type ne 'email';
 
-    # If this version of Koha sends an arrayref, check the length of it and set the var to false if it has no elements
-    $letter_code = undef if ref($letter_code) eq 'ARRAY' && scalar @$letter_code == 0;
+    # If this version of Koha sends an arrayref,
+    # check the length of it and set the var to false if it has no elements
+    $letter_code = undef
+      if ref($letter_code) eq 'ARRAY' && scalar @$letter_code == 0;
 
     my $email_footers = C4::Context->config("email_footers");
     my $footers;
-    foreach my $f ( @{$email_footers->{footer}} ) {
-        my $lang = $f->{lang} || 'default';
-        my $type = $f->{type} || 'text';
+    foreach my $f ( @{ $email_footers->{footer} } ) {
+        my $lang    = $f->{lang} || 'default';
+        my $type    = $f->{type} || 'text';
         my $content = $f->{content};
         $footers->{$lang}->{$type} = $content;
-	}
+    }
 
     my $parameters = {
         status                 => 'pending',
@@ -155,23 +156,25 @@ sub before_send_messages {
 
     my $TranslateNotices = C4::Context->preference('TranslateNotices');
 
-	while ( my $m = $messages->next ) {
-		my $lang = 'default';
-        if ( $TranslateNotices ) {
-			my $patron = Koha::Patrons->find( $m->borrowernumber );
+    while ( my $m = $messages->next ) {
+        my $lang = 'default';
+        if ($TranslateNotices) {
+            my $patron = Koha::Patrons->find( $m->borrowernumber );
             $lang = $patron->lang;
         }
 
         my $footers_for_lang = $footers->{$lang} || $footers->{default};
 
         my $content_type = $m->content_type // q{};
-        my $type = $content_type =~ m|^text/html| ? 'html' : 'text';
+        my $type         = $content_type =~ m|^text/html| ? 'html' : 'text';
 
-        my $footer = $footers_for_lang->{$type} || $footers_for_lang->{text} || q{};
+        my $footer =
+          $footers_for_lang->{$type} || $footers_for_lang->{text} || q{};
 
+        # Skip update if this email already has a footer
         $m->content( $m->content . $footer )->update()
-          if index( $m->content, $footer ) == -1; # Skip update if this email already has a footer
-	}
+          if index( $m->content, $footer ) == -1
+    }
 }
 
 =head3 intranet_js
@@ -181,7 +184,7 @@ intranet_js for this plugin, hides the disable and uninstall buttons for the plu
 =cut
 
 sub intranet_js {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     return q|
 <script>
