@@ -134,6 +134,9 @@ sub before_send_messages {
     return if ref($type) eq 'ARRAY' && scalar @$type > 0 && !grep(/^email$/, @$type); # 22.11.00, 22.05.8, 21.11.14 +, bug 27265
     return if ref($type) eq q{}     && $type ne q{}      && $type ne 'email';
 
+    # If this version of Koha sends an arrayref, check the length of it and set the var to false if it has no elements
+    $letter_code = undef if ref($letter_code) eq 'ARRAY' && scalar @$letter_code == 0;
+
     my $email_footers = C4::Context->config("email_footers");
     my $footers;
     foreach my $f ( @{$email_footers->{footer}} ) {
